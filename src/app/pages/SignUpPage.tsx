@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
-import { useAuth } from '@/app/contexts/AuthContext';
+import { supabase } from '@/app/lib/supabase';
 import { useRecaptcha } from '@/app/hooks/useRecaptcha';
 import { sendNotification } from '@/app/lib/sendNotification';
 
@@ -12,7 +12,6 @@ const PRODUCTS = [
 ];
 
 export default function SignUpPage() {
-  const { signUp, requestAccess } = useAuth();
   const navigate = useNavigate();
   const { getToken } = useRecaptcha();
 
@@ -38,22 +37,32 @@ export default function SignUpPage() {
         product,
       });
 
-      // 2. Create auth account
+      // 2. Create auth user (temp password — they'll set one if approved)
       const tempPassword = crypto.randomUUID();
-      const { error: signUpErr } = await signUp(email, tempPassword, fullName, occupation);
+      const { data, error: signUpErr } = await supabase.auth.signUp({
+        email,
+        password: tempPassword,
+        options: { data: { full_name: fullName, occupation } },
+      });
+
       if (signUpErr) {
-        setError(signUpErr);
+        setError(signUpErr.message);
         setLoading(false);
         return;
       }
 
-      // 3. Request product access (user is now signed in via signUp)
-      const { error: accessErr } = await requestAccess(product);
-      if (accessErr) {
-        setError(accessErr);
-        setLoading(false);
-        return;
+      // 3. Insert access request directly (user may not be signed in yet
+      //    if email confirmation is enabled, so use the returned user ID)
+      if (data.user) {
+        await supabase.from('product_access').insert({
+          user_id: data.user.id,
+          product,
+          status: 'pending',
+        });
       }
+
+      // Sign out so the temp session doesn't persist
+      await supabase.auth.signOut();
 
       navigate('/pending');
     } catch (err) {
