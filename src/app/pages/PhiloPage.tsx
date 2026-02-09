@@ -3,8 +3,12 @@ import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { supabase } from '@/app/lib/supabase';
+import { useRecaptcha } from '@/app/hooks/useRecaptcha';
+import { sendNotification } from '@/app/lib/sendNotification';
 
 export default function PhiloPage() {
+  const { getToken } = useRecaptcha();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [occupation, setOccupation] = useState('');
@@ -17,34 +21,48 @@ export default function PhiloPage() {
     setError(null);
     setLoading(true);
 
-    // 1. Create auth user (password-less — they'll set one later if approved)
-    const tempPassword = crypto.randomUUID();
-    const { data, error: signUpErr } = await supabase.auth.signUp({
-      email,
-      password: tempPassword,
-      options: { data: { full_name: name, occupation } },
-    });
-
-    if (signUpErr) {
-      setError(signUpErr.message);
-      setLoading(false);
-      return;
-    }
-
-    // 2. Insert access request
-    if (data.user) {
-      await supabase.from('product_access').insert({
-        user_id: data.user.id,
+    try {
+      // 1. Verify human via reCAPTCHA + notify admin
+      const token = await getToken('access_request');
+      await sendNotification('access_request', token, {
+        name,
+        email,
+        occupation,
         product: 'PHILO-001',
-        status: 'pending',
       });
+
+      // 2. Create auth user (password-less — they'll set one later if approved)
+      const tempPassword = crypto.randomUUID();
+      const { data, error: signUpErr } = await supabase.auth.signUp({
+        email,
+        password: tempPassword,
+        options: { data: { full_name: name, occupation } },
+      });
+
+      if (signUpErr) {
+        setError(signUpErr.message);
+        setLoading(false);
+        return;
+      }
+
+      // 3. Insert access request
+      if (data.user) {
+        await supabase.from('product_access').insert({
+          user_id: data.user.id,
+          product: 'PHILO-001',
+          status: 'pending',
+        });
+      }
+
+      // Sign out so the temp session doesn't persist
+      await supabase.auth.signOut();
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
-
-    // Sign out so the temp session doesn't persist
-    await supabase.auth.signOut();
-
-    setLoading(false);
-    setSubmitted(true);
   };
 
   return (
@@ -142,7 +160,7 @@ export default function PhiloPage() {
                   />
                 </div>
 
-                <MainButton type="submit">
+                <MainButton type="submit" disabled={loading}>
                   {loading ? 'SUBMITTING…' : 'REQUEST ACCESS'}
                 </MainButton>
               </form>

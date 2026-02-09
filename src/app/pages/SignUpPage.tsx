@@ -4,6 +4,8 @@ import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useRecaptcha } from '@/app/hooks/useRecaptcha';
+import { sendNotification } from '@/app/lib/sendNotification';
 
 const PRODUCTS = [
   { id: 'PHILO-001', label: 'PHILO-001 — Philosophy knowledge field' },
@@ -12,6 +14,7 @@ const PRODUCTS = [
 export default function SignUpPage() {
   const { signUp, requestAccess } = useAuth();
   const navigate = useNavigate();
+  const { getToken } = useRecaptcha();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,24 +28,38 @@ export default function SignUpPage() {
     setError(null);
     setLoading(true);
 
-    // 1. Create auth account
-    const tempPassword = crypto.randomUUID();
-    const { error: signUpErr } = await signUp(email, tempPassword, fullName, occupation);
-    if (signUpErr) {
-      setError(signUpErr);
-      setLoading(false);
-      return;
-    }
+    try {
+      // 1. Verify human via reCAPTCHA + notify admin
+      const token = await getToken('signup');
+      await sendNotification('signup', token, {
+        name: fullName,
+        email,
+        occupation,
+        product,
+      });
 
-    // 2. Request product access (user is now signed in via signUp)
-    const { error: accessErr } = await requestAccess(product);
-    if (accessErr) {
-      setError(accessErr);
-      setLoading(false);
-      return;
-    }
+      // 2. Create auth account
+      const tempPassword = crypto.randomUUID();
+      const { error: signUpErr } = await signUp(email, tempPassword, fullName, occupation);
+      if (signUpErr) {
+        setError(signUpErr);
+        setLoading(false);
+        return;
+      }
 
-    navigate('/pending');
+      // 3. Request product access (user is now signed in via signUp)
+      const { error: accessErr } = await requestAccess(product);
+      if (accessErr) {
+        setError(accessErr);
+        setLoading(false);
+        return;
+      }
+
+      navigate('/pending');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -138,7 +155,7 @@ export default function SignUpPage() {
               </select>
             </div>
 
-            <MainButton type="submit">
+            <MainButton type="submit" disabled={loading}>
               {loading ? 'SUBMITTING…' : 'REQUEST ACCESS'}
             </MainButton>
           </form>

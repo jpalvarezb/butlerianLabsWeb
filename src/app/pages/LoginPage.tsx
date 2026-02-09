@@ -4,10 +4,13 @@ import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useRecaptcha } from '@/app/hooks/useRecaptcha';
+import { sendNotification } from '@/app/lib/sendNotification';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const { getToken } = useRecaptcha();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,13 +22,23 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    const { error: err } = await signIn(email, password);
+    try {
+      // 1. Verify human via reCAPTCHA (no email sent — just bot check)
+      const token = await getToken('login');
+      await sendNotification('login_verify', token);
 
-    if (err) {
-      setError(err);
+      // 2. Authenticate
+      const { error: err } = await signIn(email, password);
+
+      if (err) {
+        setError(err);
+        setLoading(false);
+      } else {
+        navigate('/');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Verification failed.');
       setLoading(false);
-    } else {
-      navigate('/');
     }
   };
 
@@ -82,7 +95,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <MainButton type="submit">
+            <MainButton type="submit" disabled={loading}>
               {loading ? 'SIGNING IN…' : 'SIGN IN'}
             </MainButton>
           </form>

@@ -5,6 +5,7 @@ interface MainButtonProps {
   children?: React.ReactNode;
   href?: string;
   type?: 'button' | 'submit';
+  disabled?: boolean;
   onClick?: () => void;
   className?: string;
 }
@@ -16,6 +17,7 @@ export function MainButton({
   children,
   href,
   type,
+  disabled,
   onClick,
   className,
 }: MainButtonProps) {
@@ -39,7 +41,12 @@ export function MainButton({
   }
 
   return (
-    <button type={type ?? 'button'} onClick={onClick} className={styles}>
+    <button
+      type={type ?? 'button'}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(styles, disabled && 'opacity-40 pointer-events-none')}
+    >
       {children}
     </button>
   );

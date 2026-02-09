@@ -50,7 +50,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <SectionLabel>Rejections</SectionLabel>
 
-          <H2 className="mb-4 text-lg sm:text-xl lg:text-2xl">Anything that dulls cognition.</H2>
+          <H2 className="mb-4 text-lg sm:text-xl lg:text-2xl">Anything that dulls cognition</H2>
           <div className="max-w-2xl">
             <BodyText>
               Dashboards that flatten reality into charts.
@@ -85,7 +85,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <SectionLabel>Constraints</SectionLabel>
 
-          <H2 className="mb-4 text-lg sm:text-xl lg:text-2xl">Constraints</H2>
+          <H2 className="mb-4 text-lg sm:text-xl lg:text-2xl">Human, intuitive, and physical</H2>
           <ul className="max-w-2xl space-y-2">
             <li className="flex items-start gap-3 text-sm leading-relaxed text-white/70 sm:text-base">
               <span className="mt-1.5 block h-1.5 w-1.5 shrink-0 bg-white/40" />
@@ -107,19 +107,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ─── STATUS ─── */}
-      <section className="border-b border-white/10">
-        <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <SectionLabel>Status</SectionLabel>
-
-          <H2 className="mb-4 text-lg sm:text-xl lg:text-2xl">Status</H2>
-          <div className="max-w-2xl">
-            <BodyText>
-              PHILO-001 is live. FIELD-002 and METAG-003 are in development.
-            </BodyText>
-          </div>
-        </div>
-      </section>
 
       {/* ─── SYSTEMS ─── */}
       <section className="border-b border-white/10">
