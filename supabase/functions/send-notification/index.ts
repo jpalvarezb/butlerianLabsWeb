@@ -98,12 +98,19 @@ Deno.serve(async (req) => {
     });
 
     const assessment = await verifyRes.json();
+    console.log('reCAPTCHA assessment:', JSON.stringify(assessment));
+
     const tokenValid = assessment.tokenProperties?.valid === true;
     const score = assessment.riskAnalysis?.score ?? 0;
+    const invalidReason = assessment.tokenProperties?.invalidReason;
 
     if (!tokenValid || score < 0.5) {
+      const detail = invalidReason
+        ? `Verification failed: ${invalidReason}`
+        : `Verification failed (score: ${score})`;
+      console.error('reCAPTCHA rejected:', detail);
       return new Response(
-        JSON.stringify({ error: 'Human verification failed. Please try again.' }),
+        JSON.stringify({ error: detail }),
         {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
