@@ -10,7 +10,7 @@ export default function HomePage() {
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden -mt-15">
         <video autoPlay muted loop playsInline className="block w-full">
-          <source src="/video/butlerian_hero_2.mp4" type="video/mp4" />
+          <source src="/video/butlerian_hero_2_compressed.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 flex flex-col justify-end bg-black/50">

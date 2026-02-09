@@ -70,7 +70,7 @@ export default function PhiloPage() {
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden">
         <video autoPlay muted loop playsInline className="block w-full -translate-y-5 transform-gpu">
-          <source src="/video/hand_gestures_philo.mp4" type="video/mp4" />
+          <source src="/video/hand_gestures_philo_compressed.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 flex flex-col justify-end bg-black/50">

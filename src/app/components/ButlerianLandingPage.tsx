@@ -117,7 +117,7 @@ export default function ButlerianLandingPage() {
             playsInline
             className="block w-full"
           >
-            <source src="/video/butlerian_hero_2.mp4" type="video/mp4" />
+            <source src="/video/butlerian_hero_2_compressed.mp4" type="video/mp4" />
           </video>
 
           {/* Dark overlay + text */}
