@@ -73,8 +73,15 @@ export default function PhiloPage() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden">
-        <video autoPlay muted loop playsInline className="block w-full -translate-y-5 transform-gpu">
+      <section className="relative overflow-hidden bg-black">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/video/hand_gestures_philo_poster.jpg"
+          className="block w-full -translate-y-5 transform-gpu"
+        >
           <source src="/video/hand_gestures_philo_compressed.mp4" type="video/mp4" />
         </video>
 

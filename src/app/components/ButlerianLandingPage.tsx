@@ -108,13 +108,14 @@ export default function ButlerianLandingPage() {
       {/* Main content */}
       <div className="relative z-10">
         {/* ─── HERO ─── */}
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden bg-black">
           {/* Video — full width, natural 16:9 aspect ratio, no cropping */}
           <video
             autoPlay
             muted
             loop
             playsInline
+            poster="/video/butlerian_hero_poster.jpg"
             className="block w-full"
           >
             <source src="/video/butlerian_hero_2_compressed.mp4" type="video/mp4" />

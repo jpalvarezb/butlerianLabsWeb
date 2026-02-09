@@ -8,8 +8,15 @@ export default function HomePage() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden -mt-15">
-        <video autoPlay muted loop playsInline className="block w-full">
+      <section className="relative overflow-hidden -mt-15 bg-black">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/video/butlerian_hero_poster.jpg"
+          className="block w-full"
+        >
           <source src="/video/butlerian_hero_2_compressed.mp4" type="video/mp4" />
         </video>
 
