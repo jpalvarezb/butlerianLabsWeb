@@ -18,6 +18,8 @@ export default function SignUpPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [occupation, setOccupation] = useState('');
+  const [company, setCompany] = useState('');
+  const [message, setMessage] = useState('');
   const [product, setProduct] = useState('PHILO-001');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,8 @@ export default function SignUpPage() {
         name: fullName,
         email,
         occupation,
+        company,
+        message,
         product,
       });
 
@@ -42,7 +46,7 @@ export default function SignUpPage() {
       const { data, error: signUpErr } = await supabase.auth.signUp({
         email,
         password: tempPassword,
-        options: { data: { full_name: fullName, occupation } },
+        options: { data: { full_name: fullName, occupation, company } },
       });
 
       if (signUpErr) {
@@ -58,6 +62,7 @@ export default function SignUpPage() {
           user_id: data.user.id,
           product,
           status: 'pending',
+          message: message || null,
         });
       }
 
@@ -145,6 +150,23 @@ export default function SignUpPage() {
 
             <div>
               <label
+                htmlFor="company"
+                className="block text-xs tracking-[0.2em] text-white/60 mb-2"
+              >
+                COMPANY
+              </label>
+              <input
+                id="company"
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                className="w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder-white/30 focus:border-white/50 focus:outline-none"
+                placeholder="Optional"
+              />
+            </div>
+
+            <div>
+              <label
                 htmlFor="product"
                 className="block text-xs tracking-[0.2em] text-white/60 mb-2"
               >
@@ -162,6 +184,23 @@ export default function SignUpPage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="message"
+                className="block text-xs tracking-[0.2em] text-white/60 mb-2"
+              >
+                MESSAGE
+              </label>
+              <textarea
+                id="message"
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder-white/30 focus:border-white/50 focus:outline-none resize-none"
+                placeholder="Tell us why you're interested (optional)"
+              />
             </div>
 
             <MainButton type="submit" disabled={loading}>

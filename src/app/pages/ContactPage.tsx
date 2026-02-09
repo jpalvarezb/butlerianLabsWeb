@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { MainButton } from '@/app/components/shared/MainButton';
+import { supabase } from '@/app/lib/supabase';
 import { useRecaptcha } from '@/app/hooks/useRecaptcha';
 import { sendNotification } from '@/app/lib/sendNotification';
 
@@ -10,6 +11,7 @@ export default function ContactPage() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,11 @@ export default function ContactPage() {
 
     try {
       const token = await getToken('contact');
-      await sendNotification('contact', token, { name, email, message });
+      await sendNotification('contact', token, { name, email, company, message });
+
+      // Also save to Supabase so you have a record
+      await supabase.from('contact_messages').insert({ name, email, company, message });
+
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
@@ -86,6 +92,23 @@ export default function ContactPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder-white/30 focus:border-white/50 focus:outline-none"
                     placeholder="you@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="company"
+                    className="block text-xs tracking-[0.2em] text-white/60 mb-2"
+                  >
+                    COMPANY
+                  </label>
+                  <input
+                    id="company"
+                    type="text"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="w-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder-white/30 focus:border-white/50 focus:outline-none"
+                    placeholder="Optional"
                   />
                 </div>
 

@@ -18,6 +18,7 @@ interface EmailData {
   email?: string;
   message?: string;
   occupation?: string;
+  company?: string;
   product?: string;
 }
 
@@ -33,6 +34,7 @@ function buildEmail(
           <h2>New contact form submission</h2>
           <p><strong>Name:</strong> ${esc(data.name)}</p>
           <p><strong>Email:</strong> ${esc(data.email)}</p>
+          ${data.company ? `<p><strong>Company:</strong> ${esc(data.company)}</p>` : ''}
           <p><strong>Message:</strong></p>
           <p>${esc(data.message)}</p>
         `,
@@ -46,7 +48,9 @@ function buildEmail(
           <p><strong>Name:</strong> ${esc(data.name)}</p>
           <p><strong>Email:</strong> ${esc(data.email)}</p>
           <p><strong>Occupation:</strong> ${esc(data.occupation)}</p>
+          ${data.company ? `<p><strong>Company:</strong> ${esc(data.company)}</p>` : ''}
           <p><strong>System:</strong> ${esc(data.product)}</p>
+          ${data.message ? `<p><strong>Message:</strong></p><p>${esc(data.message)}</p>` : ''}
         `,
       };
 
@@ -58,7 +62,9 @@ function buildEmail(
           <p><strong>Name:</strong> ${esc(data.name)}</p>
           <p><strong>Email:</strong> ${esc(data.email)}</p>
           <p><strong>Occupation:</strong> ${esc(data.occupation)}</p>
+          ${data.company ? `<p><strong>Company:</strong> ${esc(data.company)}</p>` : ''}
           <p><strong>System:</strong> ${esc(data.product)}</p>
+          ${data.message ? `<p><strong>Message:</strong></p><p>${esc(data.message)}</p>` : ''}
         `,
       };
 

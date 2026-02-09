@@ -11,6 +11,7 @@ export interface NotificationData {
   email?: string;
   message?: string;
   occupation?: string;
+  company?: string;
   product?: string;
 }
 

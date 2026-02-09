@@ -40,3 +40,4 @@ coverage/
 *.pem
 *.cert
 *.key
+supabase/

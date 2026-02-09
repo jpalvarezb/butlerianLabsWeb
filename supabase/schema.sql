@@ -28,6 +28,7 @@ create table if not exists public.product_access (
   user_id uuid not null references auth.users(id) on delete cascade,
   product text not null,                     -- e.g. 'PHILO-001'
   status text not null default 'pending',    -- pending | approved | rejected
+  message text,                              -- optional message from the requester
   requested_at timestamptz not null default now(),
   approved_at timestamptz,
 
@@ -44,18 +45,39 @@ create policy "Users can request access (insert)"
   on public.product_access for insert
   with check (auth.uid() = user_id);
 
--- 3. Auto-create profile on signup
+-- 3. Contact messages (public — no auth required to insert)
+create table if not exists public.contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  company text,
+  message text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.contact_messages enable row level security;
+
+-- Allow anyone to insert (public contact form, no auth)
+create policy "Anyone can submit a contact message"
+  on public.contact_messages for insert
+  with check (true);
+
+-- Only service role / dashboard can read (admin only)
+-- No select policy = no public reads
+
+-- 4. Auto-create profile on signup
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, full_name, occupation)
+  insert into public.profiles (id, full_name, occupation, company)
   values (
     new.id,
     coalesce(new.raw_user_meta_data ->> 'full_name', ''),
-    new.raw_user_meta_data ->> 'occupation'
+    new.raw_user_meta_data ->> 'occupation',
+    new.raw_user_meta_data ->> 'company'
   );
   return new;
 end;
