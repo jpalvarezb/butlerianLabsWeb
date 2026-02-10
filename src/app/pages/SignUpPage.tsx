@@ -32,23 +32,36 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      // 1. Verify human via reCAPTCHA + notify admin
-      const token = await getToken('signup');
-      await sendNotification('signup', token, {
-        name: fullName,
-        email,
-        occupation,
-        company,
-        message,
-        product,
-      });
+      // 1. Verify human via reCAPTCHA + notify admin (skipped on localhost)
+      const isDev = window.location.hostname === 'localhost';
+      if (!isDev) {
+        const token = await getToken('signup');
+        await sendNotification('signup', token, {
+          name: fullName,
+          email,
+          occupation,
+          company,
+          message,
+          product,
+        });
+      }
 
-      // 2. Create auth user (temp password — they'll set one if approved)
+      // 2. Create auth user (temp password — they'll set one if approved).
+      //    Product + message are passed in metadata so the handle_new_user
+      //    trigger creates the product_access row automatically.
       const tempPassword = crypto.randomUUID();
       const { data, error: signUpErr } = await supabase.auth.signUp({
         email,
         password: tempPassword,
-        options: { data: { full_name: fullName, occupation, company } },
+        options: {
+          data: {
+            full_name: fullName,
+            occupation,
+            company,
+            product,
+            message: message || null,
+          },
+        },
       });
 
       if (signUpErr) {
@@ -65,29 +78,8 @@ export default function SignUpPage() {
         return;
       }
 
-      // 3. Insert access request directly (user may not be signed in yet
-      //    if email confirmation is enabled, so use the returned user ID)
-      if (data.user) {
-        await supabase.from('profiles').upsert(
-          {
-            id: data.user.id,
-            full_name: fullName,
-            occupation: occupation || null,
-            company: company || null,
-          },
-          { onConflict: 'id' }
-        );
-
-        await supabase.from('product_access').insert({
-          user_id: data.user.id,
-          product,
-          status: 'pending',
-          message: message || null,
-        });
-      }
-
       // Sign out so the temp session doesn't persist
-      await supabase.auth.signOut();
+      await supabase.auth.signOut().catch(() => {});
 
       navigate('/pending');
     } catch (err) {

@@ -57,29 +57,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading: true,
   });
 
-  /* Fetch product_access rows for current user */
-  const fetchAccess = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from('product_access')
-      .select('*')
-      .eq('user_id', userId);
-    return (data ?? []) as ProductAccess[];
+  /* Fetch product_access rows for current user via raw fetch.
+     This bypasses the Supabase client's internal AbortController
+     which can kill requests made during onAuthStateChange. */
+  const fetchAccess = useCallback(async (userId: string, accessToken: string) => {
+    try {
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/product_access?select=*&user_id=eq.${userId}`;
+      const res = await fetch(url, {
+        headers: {
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      return (Array.isArray(data) ? data : []) as ProductAccess[];
+    } catch {
+      return [];
+    }
   }, []);
 
   /* Listen for auth changes */
   useEffect(() => {
-    // Get initial session
+    // Get initial session — validate server-side to catch stale/deleted sessions
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const access = session ? await fetchAccess(session.user.id) : [];
-      setState({ user: session?.user ?? null, session, access, loading: false });
+      if (session) {
+        // Verify the session is still valid on the server
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
+          // Session is stale (e.g. user was deleted) — clear it
+          await supabase.auth.signOut().catch(() => {});
+          setState({ user: null, session: null, access: [], loading: false });
+          return;
+        }
+        const access = await fetchAccess(user.id, session.access_token);
+        setState({ user, session, access, loading: false });
+      } else {
+        setState({ user: null, session: null, access: [], loading: false });
+      }
     });
 
     // Subscribe to changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const access = session ? await fetchAccess(session.user.id) : [];
-      setState({ user: session?.user ?? null, session, access, loading: false });
+      try {
+        const access = session
+          ? await fetchAccess(session.user.id, session.access_token)
+          : [];
+        setState({ user: session?.user ?? null, session, access, loading: false });
+      } catch {
+        // Gracefully handle aborted requests during rapid auth state changes
+        setState((prev) => ({ ...prev, loading: false }));
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -110,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const requestAccess = async (product: string) => {
-    if (!state.user) return { error: 'Not authenticated' };
+    if (!state.user || !state.session) return { error: 'Not authenticated' };
 
     const { error } = await supabase.from('product_access').insert({
       user_id: state.user.id,
@@ -119,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (!error) {
-      const access = await fetchAccess(state.user.id);
+      const access = await fetchAccess(state.user.id, state.session.access_token);
       setState((prev) => ({ ...prev, access }));
     }
 
@@ -127,8 +157,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshAccess = async () => {
-    if (!state.user) return;
-    const access = await fetchAccess(state.user.id);
+    if (!state.user || !state.session) return;
+    const access = await fetchAccess(state.user.id, state.session.access_token);
     setState((prev) => ({ ...prev, access }));
   };
 

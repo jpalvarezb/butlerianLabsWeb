@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { jwtVerify } from 'jose';
 import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { supabase } from '@/app/lib/supabase';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 interface TokenPayload {
   user_id: string;
@@ -82,21 +83,31 @@ export default function CreateAccountPage() {
     try {
       const token = searchParams.get('token')!;
 
-      const invokePromise = supabase.functions.invoke('complete-account-setup', {
-        body: { token, password },
-      });
-      const { data, error: setupError } = await Promise.race([invokePromise, timeoutPromise]);
+      // Use raw fetch to bypass Supabase client's internal AbortController
+      const setupRes = await Promise.race([
+        fetch(`${SUPABASE_URL}/functions/v1/complete-account-setup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password }),
+        }),
+        timeoutPromise,
+      ]);
 
-      if (setupError || data?.error) {
-        setError(data?.error || setupError.message);
+      const setupData = await setupRes.json();
+
+      if (!setupRes.ok || setupData.error) {
+        setError(setupData.error || 'Failed to set up account');
         return;
       }
 
-      const signInPromise = supabase.auth.signInWithPassword({
-        email: tokenPayload!.email,
-        password,
-      });
-      const { error: signInError } = await Promise.race([signInPromise, timeoutPromise]);
+      // Sign in with the new password
+      const { error: signInError } = await Promise.race([
+        supabase.auth.signInWithPassword({
+          email: tokenPayload!.email,
+          password,
+        }),
+        timeoutPromise,
+      ]);
 
       if (signInError) {
         setError('Account created but sign-in failed. Please try logging in manually.');
