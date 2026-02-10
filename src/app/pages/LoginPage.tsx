@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
@@ -6,30 +6,54 @@ import { H1, BodyText } from '@/app/components/shared/Typography';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 export default function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, user, loading, accessStatus } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState(false);
+
+  // After login succeeds, wait for auth state (including access) to resolve,
+  // then redirect based on the user's product access status.
+  useEffect(() => {
+    if (!loginSuccess || loading || !user) return;
+
+    const status = accessStatus('PHILO-001');
+
+    if (status === 'approved') {
+      navigate('/philo-001');
+    } else if (status === 'pending') {
+      // Stay on /login, show pending message
+      setPendingMessage(true);
+      setLoginSuccess(false);
+      setSubmitting(false);
+    } else {
+      navigate('/');
+    }
+  }, [loginSuccess, loading, user, accessStatus, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setPendingMessage(false);
+    setSubmitting(true);
 
     try {
       const { error: err } = await signIn(email, password);
 
       if (err) {
         setError(err);
+        setSubmitting(false);
       } else {
-        navigate('/');
+        // Signal that login succeeded — the useEffect above handles redirect
+        setLoginSuccess(true);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -44,6 +68,10 @@ export default function LoginPage() {
           <BodyText>
             Sign in to access your Butlerian systems.
           </BodyText>
+
+          {pendingMessage && (
+            <p className="text-sm text-[#03ff8a]">Request pending approval</p>
+          )}
 
           {error && (
             <p className="text-sm text-[#03ff8a]">{error}</p>
@@ -86,8 +114,8 @@ export default function LoginPage() {
               />
             </div>
 
-            <MainButton type="submit" disabled={loading}>
-              {loading ? 'SIGNING IN…' : 'SIGN IN'}
+            <MainButton type="submit" disabled={submitting}>
+              {submitting ? 'SIGNING IN…' : 'SIGN IN'}
             </MainButton>
           </form>
 
