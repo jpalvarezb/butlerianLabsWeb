@@ -66,6 +66,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
 
           {user ? (
             <PixelButton
+              key="menu-logout"
               hover
               onClick={() => {
                 signOut();
@@ -76,6 +77,8 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             </PixelButton>
           ) : (
             <PixelButton
+              key="menu-login"
+              color="#13ff8b"
               hover
               onClick={() => {
                 navigate('/login');

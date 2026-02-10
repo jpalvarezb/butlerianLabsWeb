@@ -161,11 +161,10 @@ export default function PhiloPage() {
 
         <div className="absolute inset-0 flex flex-col justify-end bg-black/50">
           <div className="mx-auto w-full max-w-[1200px] px-4 pb-8 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
-            <H1>Philosophical Research Field</H1>
+            <H1>Human Knowledge Graph</H1>
 
             <BodyText className="mt-6 max-w-2xl">
-              A spatial field for researching philosophy, culture, and history.
-              Directly explore ideas, relationships, and evidence.
+              Research ethics, metaphysics, epistemology, theology, anthropology, and history.
             </BodyText>
           </div>
         </div>
