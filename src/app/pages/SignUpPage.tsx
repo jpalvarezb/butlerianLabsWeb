@@ -22,11 +22,13 @@ export default function SignUpPage() {
   const [message, setMessage] = useState('');
   const [product, setProduct] = useState('PHILO-001');
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setLoading(true);
 
     try {
@@ -51,6 +53,14 @@ export default function SignUpPage() {
 
       if (signUpErr) {
         setError(signUpErr.message);
+        setLoading(false);
+        return;
+      }
+
+      // Detect duplicate email: Supabase returns a user with empty identities
+      // when email confirmation is enabled and the email already exists.
+      if (data.user?.identities?.length === 0) {
+        setInfo('An account with this email already exists. Please log in instead.');
         setLoading(false);
         return;
       }
@@ -90,7 +100,11 @@ export default function SignUpPage() {
           </BodyText>
 
           {error && (
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-[#03ff8a]">{error}</p>
+          )}
+
+          {info && (
+            <p className="text-sm text-[#03ff8a]">{info}</p>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>

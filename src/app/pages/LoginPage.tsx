@@ -4,13 +4,10 @@ import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { useRecaptcha } from '@/app/hooks/useRecaptcha';
-import { sendNotification } from '@/app/lib/sendNotification';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const { getToken } = useRecaptcha();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,11 +20,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Verify human via reCAPTCHA (no email sent — just bot check)
-      const token = await getToken('login');
-      await sendNotification('login_verify', token);
-
-      // 2. Authenticate
       const { error: err } = await signIn(email, password);
 
       if (err) {
@@ -37,7 +29,7 @@ export default function LoginPage() {
         navigate('/');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Verification failed.');
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
       setLoading(false);
     }
   };
@@ -55,7 +47,7 @@ export default function LoginPage() {
           </BodyText>
 
           {error && (
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-[#03ff8a]">{error}</p>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>

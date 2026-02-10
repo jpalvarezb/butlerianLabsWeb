@@ -127,7 +127,7 @@ export default function CreateAccountPage() {
           <SectionLabel>Account Setup</SectionLabel>
           <H1>Invalid invitation</H1>
           <div className="max-w-lg mt-8 space-y-6">
-            <BodyText className="text-red-400">{error}</BodyText>
+            <BodyText className="text-[#03ff8a]">{error}</BodyText>
             <MainButton href="/">BACK TO HOME</MainButton>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function CreateAccountPage() {
             Set your password to continue.
           </BodyText>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-[#03ff8a]">{error}</p>}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
