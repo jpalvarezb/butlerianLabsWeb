@@ -12,6 +12,7 @@ import LoginPage from './app/pages/LoginPage';
 import SignUpPage from './app/pages/SignUpPage';
 import PendingPage from './app/pages/PendingPage';
 import PhiloPage from './app/pages/PhiloPage';
+import CreateAccountPage from './app/pages/CreateAccountPage';
 
 /**
  * Called by vite-prerender-plugin at build time for each route.
@@ -31,6 +32,7 @@ export async function prerender(data: { url: string }) {
             <Route path="login" element={<LoginPage />} />
             <Route path="signup" element={<SignUpPage />} />
             <Route path="pending" element={<PendingPage />} />
+            <Route path="create-account" element={<CreateAccountPage />} />
             <Route path="philo-001" element={<PhiloPage />} />
           </Route>
         </Routes>
@@ -49,6 +51,7 @@ export async function prerender(data: { url: string }) {
       '/login',
       '/signup',
       '/pending',
+      '/create-account',
       '/philo-001',
     ]),
   };

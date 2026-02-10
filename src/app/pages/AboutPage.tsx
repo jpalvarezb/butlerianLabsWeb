@@ -2,25 +2,22 @@ import { MainButton } from '@/app/components/shared/MainButton';
 import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { SystemCard } from '@/app/components/shared/SystemCard';
 import { H1, H2, BodyText } from '@/app/components/shared/Typography';
+import { valueProp } from '@/app/content/valueProp';
 
 export default function AboutPage() {
   return (
     <>
-      {/* ─── HEADER + DOGMA ─── */}
-      <section className="border-b border-white/10">
+      {/* ─── WHAT WE BELIEVE ─── */}
+      <section id="beliefs" className="border-b border-white/10">
         <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <SectionLabel>Dogma</SectionLabel>
+          <SectionLabel>{valueProp.aboutBeliefsLabel}</SectionLabel>
 
           <H1>About Butlerian Labs</H1>
 
-
-          <div className="max-w-2xl mt-8">
-            <BodyText>
-              Complexity isn't a feeling. It's structure.
-            </BodyText>
-            <BodyText>
-              If the structure is visible, the system becomes usable.
-            </BodyText>
+          <div className="max-w-2xl mt-8 space-y-5">
+            {valueProp.aboutBeliefsParagraphs.map((p) => (
+              <BodyText key={p}>{p}</BodyText>
+            ))}
           </div>
           <div className="mt-6">
             <MainButton href="/contact">CONTACT US</MainButton>

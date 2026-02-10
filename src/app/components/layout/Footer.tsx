@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { valueProp } from '@/app/content/valueProp';
 
 const FOOTER_LINKS = [
   { label: 'PHILO-001', href: '/philo-001' },
@@ -15,7 +16,7 @@ export function Footer() {
             BUTLERIAN LABS
           </div>
           <p className="text-sm text-white/50">
-            Human-first interfaces for understanding complexity.
+            {valueProp.footerTagline}
           </p>
         </div>
 

@@ -3,6 +3,7 @@ import { TextBlock } from '@/app/components/shared/TextBlock';
 import { SystemCard } from '@/app/components/shared/SystemCard';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, H2, BodyText } from '@/app/components/shared/Typography';
+import { valueProp } from '@/app/content/valueProp';
 
 export default function HomePage() {
   return (
@@ -20,41 +21,35 @@ export default function HomePage() {
           <source src="/video/butlerian_hero_2_compressed.mp4" type="video/mp4" />
         </video>
 
-        <div className="absolute inset-0 flex flex-col justify-end bg-black/50">
-          <div className="mx-auto w-full max-w-[1200px] px-4 pb-8 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
-            <H1>
-              Human-first interactions.
-              <br />
-              <span className="opacity-50 block text-lg sm:text-2xl md:text-[35px] lg:text-[45px]">
-                Understanding, through structure.
-              </span>
-            </H1>
+        <div className="absolute inset-0 flex flex-col justify-end">
+          <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 pb-15 sm:px-6 sm:pb-22 lg:px-8">
+            <div className="pointer-events-none absolute -inset-x-8 -inset-y-6 rounded-[32px] bg-[radial-gradient(80%_120%_at_50%_50%,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.25)_40%,rgba(0,0,0,0.1)_60%,transparent_80%)] blur-[2px]" />
 
-            <BodyText className="mb-6 sm:mb-8 max-w-lg text-xs sm:text-base">
-              Discover ideas, data, and evidence
-              <br />
-              as structure you can see and control.
-            </BodyText>
-
-            <MainButton href="/philo-001">REQUEST ACCESS</MainButton>
+            <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <H1 className="mb-0">{valueProp.heroHeadline}</H1>
+              <MainButton href="/philo-001" className="sm:shrink-0">
+                REQUEST ACCESS
+              </MainButton>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ─── WHAT BUTLERIAN IS ─── */}
+      {/* ─── WHAT WE BELIEVE ─── */}
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <SectionLabel>About</SectionLabel>
+          <SectionLabel>{valueProp.aboutBeliefsLabel}</SectionLabel>
 
-          <H2>Interfaces for thinking</H2>
+          <H2>{valueProp.homeBeliefsHeading}</H2>
 
           <div className="max-w-2xl space-y-5">
-            <BodyText>
-              Butlerian Labs designs human-first interactions for cognition.
-            </BodyText>
-            <BodyText>
-              Structure stays visible, and evidence stays attached.
-            </BodyText>
+            {valueProp.homeBeliefsParagraphs.map((p) => (
+              <BodyText key={p}>{p}</BodyText>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <MainButton href="/about">{valueProp.homeBeliefsCtaLabel}</MainButton>
           </div>
         </div>
       </section>
@@ -150,7 +145,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-12 flex justify-center">
-            <MainButton href="/about">LEARN MORE</MainButton>
+            <MainButton href="/philo-001">REQUEST ACCESS</MainButton>
           </div>
         </div>
       </section>

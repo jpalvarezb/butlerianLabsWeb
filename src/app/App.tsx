@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import PendingPage from './pages/PendingPage';
 import PhiloPage from './pages/PhiloPage';
+import CreateAccountPage from './pages/CreateAccountPage';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignUpPage /> },
       { path: 'pending', element: <PendingPage /> },
+      { path: 'create-account', element: <CreateAccountPage /> },
 
       /* ── Product pages ── */
       { path: 'philo-001', element: <PhiloPage /> },
