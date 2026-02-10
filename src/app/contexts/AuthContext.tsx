@@ -79,23 +79,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /* Listen for auth changes */
   useEffect(() => {
-    // Get initial session — validate server-side to catch stale/deleted sessions
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        // Verify the session is still valid on the server
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
-          // Session is stale (e.g. user was deleted) — clear it
-          await supabase.auth.signOut().catch(() => {});
+    // Get initial session — validate server-side to catch stale/deleted sessions.
+    // Wrap in catch so getSession/getUser rejections (e.g. network/abort) never hit prod console.
+    supabase.auth
+      .getSession()
+      .then(async ({ data: { session } }) => {
+        try {
+          if (session) {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
+              await supabase.auth.signOut().catch(() => {});
+              setState({ user: null, session: null, access: [], loading: false });
+              return;
+            }
+            const access = await fetchAccess(user.id, session.access_token);
+            setState({ user, session, access, loading: false });
+          } else {
+            setState({ user: null, session: null, access: [], loading: false });
+          }
+        } catch {
           setState({ user: null, session: null, access: [], loading: false });
-          return;
         }
-        const access = await fetchAccess(user.id, session.access_token);
-        setState({ user, session, access, loading: false });
-      } else {
+      })
+      .catch(() => {
         setState({ user: null, session: null, access: [], loading: false });
-      }
-    });
+      });
 
     // Subscribe to changes
     const {
@@ -107,7 +115,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           : [];
         setState({ user: session?.user ?? null, session, access, loading: false });
       } catch {
-        // Gracefully handle aborted requests during rapid auth state changes
         setState((prev) => ({ ...prev, loading: false }));
       }
     });
@@ -118,24 +125,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ── Actions ── */
 
   const signUp = async (email: string, password: string, fullName: string, occupation?: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName, occupation } },
-    });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName, occupation } },
+      });
+      return { error: error?.message ?? null };
+    } catch (e) {
+      const isAbort = e instanceof Error && e.name === 'AbortError';
+      return {
+        error: isAbort
+          ? 'Request was cancelled. Please try again.'
+          : (e instanceof Error ? e.message : 'Something went wrong. Please try again.'),
+      };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error: error?.message ?? null };
+    } catch (e) {
+      // Supabase client can throw AbortError when request is aborted (e.g. nav/unmount).
+      // Never let this escape as uncaught in prod.
+      const isAbort = e instanceof Error && e.name === 'AbortError';
+      if (isAbort) {
+        return { error: 'Request was cancelled. Please try again.' };
+      }
+      return {
+        error: e instanceof Error ? e.message : 'Something went wrong. Please try again.',
+      };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Ignore signOut errors (e.g. network/abort)
+    }
     setState({ user: null, session: null, access: [], loading: false });
   };
 
