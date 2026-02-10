@@ -55,8 +55,18 @@ export default function PhiloPage() {
         return;
       }
 
-      // 3. Insert access request
+      // 3. Ensure profile exists (trigger usually does this; upsert so it's guaranteed)
       if (data.user) {
+        await supabase.from('profiles').upsert(
+          {
+            id: data.user.id,
+            full_name: name,
+            occupation: occupation || null,
+            company: company || null,
+          },
+          { onConflict: 'id' }
+        );
+
         await supabase.from('product_access').insert({
           user_id: data.user.id,
           product: 'PHILO-001',

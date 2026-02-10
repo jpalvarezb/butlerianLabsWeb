@@ -27,8 +27,8 @@ export default function CreateAccountPage() {
   useEffect(() => {
     const token = searchParams.get('token');
     if (!token) {
-      setError('Missing invitation token');
-      setVerifying(false);
+      // Block direct access — only allow via email magic link
+      navigate('/', { replace: true });
       return;
     }
 
@@ -74,37 +74,39 @@ export default function CreateAccountPage() {
 
     setLoading(true);
 
+    const timeoutMs = 25000;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Request timed out. Please try again.')), timeoutMs)
+    );
+
     try {
       const token = searchParams.get('token')!;
 
-      // Call complete-account-setup edge function
-      const { data, error: setupError } = await supabase.functions.invoke(
-        'complete-account-setup',
-        { body: { token, password } }
-      );
+      const invokePromise = supabase.functions.invoke('complete-account-setup', {
+        body: { token, password },
+      });
+      const { data, error: setupError } = await Promise.race([invokePromise, timeoutPromise]);
 
       if (setupError || data?.error) {
         setError(data?.error || setupError.message);
-        setLoading(false);
         return;
       }
 
-      // Sign in with the new password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const signInPromise = supabase.auth.signInWithPassword({
         email: tokenPayload!.email,
         password,
       });
+      const { error: signInError } = await Promise.race([signInPromise, timeoutPromise]);
 
       if (signInError) {
         setError('Account created but sign-in failed. Please try logging in manually.');
-        setLoading(false);
         return;
       }
 
-      // Success - redirect to product
       navigate('/philo-001');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
       setLoading(false);
     }
   };
