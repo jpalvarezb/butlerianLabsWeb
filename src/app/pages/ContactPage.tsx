@@ -56,7 +56,7 @@ export default function ContactPage() {
                 we&apos;ll get back to you.
               </BodyText>
 
-              {error && <p className="text-sm text-red-400">{error}</p>}
+              {error && <p className="text-sm text-[#03ff8a]">{error}</p>}
 
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>

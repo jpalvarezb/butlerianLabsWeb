@@ -29,7 +29,6 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
-    } finally {
       setLoading(false);
     }
   };
@@ -47,7 +46,7 @@ export default function LoginPage() {
           </BodyText>
 
           {error && (
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-[#03ff8a]">{error}</p>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
