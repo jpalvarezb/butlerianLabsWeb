@@ -4,13 +4,10 @@ import { SectionLabel } from '@/app/components/shared/SectionLabel';
 import { MainButton } from '@/app/components/shared/MainButton';
 import { H1, BodyText } from '@/app/components/shared/Typography';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { useRecaptcha } from '@/app/hooks/useRecaptcha';
-import { sendNotification } from '@/app/lib/sendNotification';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const { getToken } = useRecaptcha();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,18 +19,8 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    const timeoutMs = 25000;
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Request timed out. Please try again.')), timeoutMs)
-    );
-
     try {
-      // 1. Verify human via reCAPTCHA (no email sent — just bot check)
-      const token = await Promise.race([getToken('login'), timeoutPromise]);
-      await Promise.race([sendNotification('login_verify', token), timeoutPromise]);
-
-      // 2. Authenticate
-      const { error: err } = await Promise.race([signIn(email, password), timeoutPromise]);
+      const { error: err } = await signIn(email, password);
 
       if (err) {
         setError(err);
@@ -41,7 +28,7 @@ export default function LoginPage() {
         navigate('/');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Verification failed.');
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setLoading(false);
     }
