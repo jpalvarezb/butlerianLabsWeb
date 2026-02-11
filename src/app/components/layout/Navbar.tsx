@@ -47,14 +47,14 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Login — right, desktop only */}
+          {/* Login — right, desktop only. Keys force fresh DOM on switch so Log in never inherits Log out hover (white). */}
           <div className="hidden md:flex items-center">
             {user ? (
-              <PixelButton hover onClick={() => signOut()}>
+              <PixelButton key="nav-logout" hover onClick={() => signOut()}>
                 Log out
               </PixelButton>
             ) : (
-              <PixelButton color="#13ff8b" hover onClick={() => navigate('/login')}>
+              <PixelButton key="nav-login" color="#13ff8b" hover onClick={() => navigate('/login')}>
                 Log in
               </PixelButton>
             )}

@@ -10,24 +10,34 @@ export default function HomePage() {
     <>
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden -mt-15 bg-black">
+        {/* Mobile: static image, center-right crop to emphasize chatbot */}
+        <div className="relative block w-full md:hidden aspect-[9/16] max-h-[85vh] overflow-hidden">
+          <img
+            src="/images/mobile_hero.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[75%_50%]"
+          />
+        </div>
+        {/* Desktop: video */}
         <video
           autoPlay
           muted
           loop
           playsInline
           poster="/video/butlerian_hero_poster.jpg"
-          className="block w-full"
+          className="hidden md:block w-full"
         >
           <source src="/video/butlerian_hero_2_compressed.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 flex flex-col justify-end">
-          <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 pb-15 sm:px-6 sm:pb-22 lg:px-8">
+          <div className="relative z-10 mx-auto w-full max-w-[1200px] px-4 pb-24 sm:px-6 sm:pb-32 lg:px-8 lg:pb-40">
             <div className="pointer-events-none absolute -inset-x-8 -inset-y-6 rounded-[32px] bg-[radial-gradient(80%_120%_at_50%_50%,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.25)_40%,rgba(0,0,0,0.1)_60%,transparent_80%)] blur-[2px]" />
 
-            <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            {/* Mobile: H1 up, button down (justify-between); button width fits text with max. Desktop: row, button shrink-0 */}
+            <div className="relative z-10 flex min-h-[200px] flex-col justify-between items-start sm:min-h-0 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
               <H1 className="mb-0">{valueProp.heroHeadline}</H1>
-              <MainButton href="/philo-001" className="sm:shrink-0">
+              <MainButton href="/philo-001" className="w-fit max-w-[min(100%,280px)] shrink-0 sm:max-w-none">
                 REQUEST ACCESS
               </MainButton>
             </div>
@@ -37,7 +47,7 @@ export default function HomePage() {
 
       {/* ─── WHAT WE BELIEVE ─── */}
       <section className="border-b border-white/10">
-        <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <div className="mx-auto max-w-[1200px] px-4 pb-16 pt-0 sm:px-6 sm:pb-24 lg:px-8 lg:pb-24">
           <SectionLabel>{valueProp.aboutBeliefsLabel}</SectionLabel>
 
           <H2>{valueProp.homeBeliefsHeading}</H2>

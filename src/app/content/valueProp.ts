@@ -25,7 +25,7 @@ export const valueProp = {
     "We are not anti-software or anti-automation; we are against black-box substitution where the system cannot show its evidence and provenance.",
   ],
 
-  footerTagline: 'Instruments for thinking — structure, evidence, and human control.',
+  footerTagline: 'Instruments for thinking.',
   metaDescription:
     'Butlerian Labs builds instruments for thinking: interfaces that keep humans in control while scaling access to data, context, and memory. Truth comes from evidence and provenance.',
 } as const;
