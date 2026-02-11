@@ -52,7 +52,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
         </div>
 
         {/* Mobile nav links */}
-        <nav className="flex flex-col gap-8 px-8 pt-10">
+        <nav className="flex flex-col gap-8 items-start px-8 pt-10">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
@@ -68,6 +68,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             <PixelButton
               key="menu-logout"
               hover
+              className="w-fit max-w-[min(100%,280px)]"
               onClick={() => {
                 signOut();
                 onClose();
@@ -80,6 +81,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
               key="menu-login"
               color="#13ff8b"
               hover
+              className="w-fit max-w-[min(100%,280px)]"
               onClick={() => {
                 navigate('/login');
                 onClose();

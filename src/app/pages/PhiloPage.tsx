@@ -148,19 +148,33 @@ export default function PhiloPage() {
     <>
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden bg-black">
+        {/* Mobile: looping header video (use .mp4 for best compatibility; .mov works in Safari) */}
+        <div className="relative block w-full md:hidden aspect-[9/16] max-h-[85vh] overflow-hidden bg-black">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          >
+            <source src="/video/mobile_philo_header.mp4" type="video/mp4" />
+            <source src="/video/mobile_philo_header.mov" type="video/quicktime" />
+          </video>
+        </div>
+        {/* Desktop: hand gestures video */}
         <video
           autoPlay
           muted
           loop
           playsInline
           poster="/video/hand_gestures_philo_poster.jpg"
-          className="block w-full -translate-y-5 transform-gpu"
+          className="hidden md:block w-full -translate-y-5 transform-gpu"
         >
           <source src="/video/hand_gestures_philo_compressed.mp4" type="video/mp4" />
         </video>
 
         <div className="absolute inset-0 flex flex-col justify-end bg-black/50">
-          <div className="mx-auto w-full max-w-[1200px] px-4 pb-8 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
+          <div className="mx-auto w-full max-w-[1200px] mt-[15px] px-4 pb-8 sm:px-6 sm:pb-16 md:mt-0 lg:px-8 lg:pb-20">
             <H1>Human Knowledge Graph</H1>
 
             <BodyText className="mt-6 max-w-2xl">

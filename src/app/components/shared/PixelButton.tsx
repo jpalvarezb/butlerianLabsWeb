@@ -1,9 +1,12 @@
+import { cn } from '@/app/components/ui/utils';
+
 interface PixelButtonProps {
   children?: React.ReactNode;
   color?: string;
   hover?: boolean;
   /** When true, button uses accent color as fill (default); outline on hover. Prevents white flash when swapping nav state. */
   filled?: boolean;
+  className?: string;
   onClick?: () => void;
 }
 
@@ -12,6 +15,7 @@ export function PixelButton({
   color = '#fff',
   hover = false,
   filled = false,
+  className,
   onClick,
 }: PixelButtonProps) {
   const defaultBg = filled ? color : 'transparent';
@@ -20,9 +24,11 @@ export function PixelButton({
   return (
     <button
       onClick={onClick}
-      className={`inline-block cursor-pointer select-none border-2 px-2 py-1 text-[16px] tracking-[0.04em]${
-        hover ? ' transition-colors duration-150' : ''
-      }`}
+      className={cn(
+        'inline-block cursor-pointer select-none border-2 px-2 py-1 text-[16px] tracking-[0.04em]',
+        hover && 'transition-colors duration-150',
+        className
+      )}
       style={{
         backgroundColor: defaultBg,
         borderColor: color,
