@@ -22,7 +22,6 @@ export default function PhiloPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [iframeLoading, setIframeLoading] = useState(true);
   const [iframeError, setIframeError] = useState(false);
 
   const handleRequestAccess = async (e: React.FormEvent) => {
@@ -104,16 +103,6 @@ export default function PhiloPage() {
   if (hasAccess('PHILO-001')) {
     return (
       <section className="relative bg-black">
-        {/* Loading state */}
-        {iframeLoading && !iframeError && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80">
-            <div className="text-center">
-              <SectionLabel>Loading</SectionLabel>
-              <BodyText className="mt-4">Initializing knowledge graph...</BodyText>
-            </div>
-          </div>
-        )}
-
         {/* Error state */}
         {iframeError && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80">
@@ -132,12 +121,8 @@ export default function PhiloPage() {
           className="w-full border-0"
           style={{ height: 'calc(100vh - 60px)', minHeight: '600px' }}
           title="PHILO-001 Knowledge Graph"
-          onLoad={() => setIframeLoading(false)}
-          onError={() => {
-            setIframeLoading(false);
-            setIframeError(true);
-          }}
-          allow="clipboard-write"
+          onError={() => setIframeError(true)}
+          allow="clipboard-write; camera; microphone"
         />
       </section>
     );
@@ -148,13 +133,14 @@ export default function PhiloPage() {
     <>
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden bg-black">
-        {/* Mobile: looping header video (use .mp4 for best compatibility; .mov works in Safari) */}
+        {/* Mobile: looping header video (poster shows until video loads, like desktop) */}
         <div className="relative block w-full md:hidden aspect-[9/16] max-h-[85vh] overflow-hidden bg-black">
           <video
             autoPlay
             muted
             loop
             playsInline
+            poster="/video/mobile_philo_header_poster.jpg"
             className="absolute inset-0 h-full w-full object-cover object-center"
           >
             <source src="/video/mobile_philo_header.mp4" type="video/mp4" />
