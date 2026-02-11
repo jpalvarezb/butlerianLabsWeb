@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden -mt-15 bg-black">
+      <section className="relative overflow-hidden -md:pt-15 bg-black">
         {/* Mobile: static image, center-right crop to emphasize chatbot */}
         <div className="relative block w-full md:hidden aspect-[9/16] max-h-[85vh] overflow-hidden">
           <img

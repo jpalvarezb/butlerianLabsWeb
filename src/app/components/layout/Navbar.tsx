@@ -34,8 +34,8 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Nav links — centered, desktop only */}
-          <div className="hidden md:flex items-center gap-8 absolute left-[65%] -translate-x-1/2">
+          {/* Nav links — centered, desktop only (lg+); tablets get mobile nav */}
+          <div className="hidden lg:flex items-center gap-8 absolute left-[65%] -translate-x-1/2">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}
@@ -47,8 +47,8 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Login — right, desktop only. Keys force fresh DOM on switch so Log in never inherits Log out hover (white). */}
-          <div className="hidden md:flex items-center">
+          {/* Login — right, desktop only (lg+). Keys force fresh DOM on switch so Log in never inherits Log out hover (white). */}
+          <div className="hidden lg:flex items-center">
             {user ? (
               <PixelButton key="nav-logout" hover onClick={() => signOut()}>
                 Log out
@@ -60,9 +60,9 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Hamburger — mobile only */}
+          {/* Hamburger — mobile + tablet (below lg) */}
           <button
-            className="md:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8"
+            className="lg:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
           >

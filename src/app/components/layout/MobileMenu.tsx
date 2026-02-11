@@ -16,7 +16,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
           open ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -24,7 +24,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
 
       {/* Slide-in panel */}
       <div
-        className={`fixed top-0 right-0 z-[60] h-full w-72 bg-black border-l border-white/10 transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-[60] h-full w-72 bg-black border-l border-white/10 transition-transform duration-300 ease-in-out lg:hidden ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

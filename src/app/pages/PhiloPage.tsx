@@ -6,12 +6,14 @@ import { supabase } from '@/app/lib/supabase';
 import { useRecaptcha } from '@/app/hooks/useRecaptcha';
 import { sendNotification } from '@/app/lib/sendNotification';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useIsMobile } from '@/app/components/ui/use-mobile';
 
 const PHILO_URL = import.meta.env.VITE_PHILO_URL || 'https://philo.butlerian.xyz';
 
 export default function PhiloPage() {
   const { getToken } = useRecaptcha();
   const { hasAccess, loading: authLoading } = useAuth();
+  const isMobile = useIsMobile();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -99,8 +101,20 @@ export default function PhiloPage() {
     );
   }
 
-  // ─── APPROVED: iframe only (navbar + iframe + footer handled by Layout) ───
+  // ─── APPROVED: desktop/tablet = iframe; mobile (phone) = message ───
   if (hasAccess('PHILO-001')) {
+    if (isMobile) {
+      return (
+        <section className="flex min-h-[calc(100vh-60px)] items-center justify-center bg-black">
+          <p
+            className="text-center px-4 text-[#03ff8a] text-sm sm:text-base"
+            style={{ fontFamily: '"Press Start 2P", cursive' }}
+          >
+            PHILO-001 is a desktop and tablet experience.
+          </p>
+        </section>
+      );
+    }
     return (
       <section className="relative bg-black">
         {/* Error state */}
